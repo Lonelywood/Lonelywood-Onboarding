@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lonelywood_onboarding_next">next</string>
+    <string name="lonelywood_onboarding_skip">Skip</string>
+    <string name="lonelywood_onboarding_finish">Let\'s go!</string>
+</resources>
