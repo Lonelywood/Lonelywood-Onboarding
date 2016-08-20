@@ -41,6 +41,7 @@ namespace Lonelywood.Onboarding.Android
         public int ButtonSkipLayout { get; set; } = Resource.Layout.onboarding_skip_button;
         public int ButtonFinishLayout { get; set; } = Resource.Layout.onboarding_finish_button;
         public int HideOnboardingAnimation { get; set; } = -1;
+        public IIndicatorController IndicatorController { get; set; } = new SimpleIndicatorController(Resource.Drawable.onboarding_indicator_selected, Resource.Drawable.onboarding_indicator_unselected);
 
         public void Show(FragmentManager fragmentManager) {
             _viewPagerAdapter = new OnboardingFragmentPagerAdapter(fragmentManager, Fragments);
@@ -49,10 +50,14 @@ namespace Lonelywood.Onboarding.Android
 
             _viewPager.Adapter = _viewPagerAdapter;
             _viewPager.SetPageTransformer(true, PageTransformer);
+            _viewPager.OffscreenPageLimit = _viewPagerAdapter.Count;
 
             PageTransformer.TransformPageEvent += OnTranformPageEvent;
 
             AddViews();
+
+            if (IndicatorController != null)
+                AddView(IndicatorController.Initialize(_context, _viewPagerAdapter.Count));
 
             RegisterForEvents();
 
@@ -79,7 +84,6 @@ namespace Lonelywood.Onboarding.Android
             _finishButton.Visibility = ViewStates.Gone;
 
             if (_finishButton == null) throw new ArgumentException("ButtonFinishLayout must have AppCompatButton with lonelywood_onboarding_finish_button id.");
-
         }
 
         private void AddViews() {
@@ -127,6 +131,8 @@ namespace Lonelywood.Onboarding.Android
 
             if (ShowFinishButton)
                 _finishButton.Visibility = e.Position == _viewPagerAdapter.Count - 1 ? ViewStates.Visible : ViewStates.Gone;
+
+            IndicatorController.SelectPosition(e.Position);
         }
 
         private void OnTranformPageEvent(object sender, TransformPageEventArgs e) {
