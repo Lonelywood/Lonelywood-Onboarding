@@ -23,6 +23,12 @@ namespace Onboarding.Sample.Android
             onboarding.Fragments.Add(PageFragment.NewInstance(Resource.Layout.onboarding_page, Resource.Drawable.page_2));
             onboarding.Fragments.Add(PageFragment.NewInstance(Resource.Layout.onboarding_page, Resource.Drawable.page_3));
 
+            // Don't show finish button
+            onboarding.ShowFinishButton = false;
+
+            // Set custom hide animation:
+            onboarding.HideOnboardingAnimation = Resource.Animation.onboarding_close_like_modal;
+            
             // Show onboarding layout
             onboarding.Show(SupportFragmentManager);
         }

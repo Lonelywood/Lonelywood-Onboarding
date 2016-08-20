@@ -1,7 +1,7 @@
-using Android.Content;
 using Android.OS;
 using Android.Util;
 using Android.Views;
+using Android.Content;
 using Android.Runtime;
 using Android.Support.V7.Widget;
 using Lonelywood.Onboarding.Android;

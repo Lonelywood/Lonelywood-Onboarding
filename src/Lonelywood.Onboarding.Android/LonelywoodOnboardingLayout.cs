@@ -9,6 +9,7 @@ using Android.Support.V7.Widget;
 using System;
 using System.Windows.Input;
 using System.Collections.Generic;
+using Android.Views.Animations;
 
 namespace Lonelywood.Onboarding.Android
 {
@@ -30,14 +31,16 @@ namespace Lonelywood.Onboarding.Android
             Visibility = ViewStates.Gone;
         }
 
-        public List<OnboardingFragment> Fragments { get; } = new List<OnboardingFragment>();
-        public OnboardingPageTransformer PageTransformer { get; set; } = new OnboardingPageTransformer();
+        public bool ShowFinishButton { get; set; } = true;
         public ICommand ButtonNextCommand { get; set; }
         public ICommand ButtonSkipCommand { get; set; }
         public ICommand ButtonFinishCommand { get; set; }
+        public List<OnboardingFragment> Fragments { get; } = new List<OnboardingFragment>();
+        public OnboardingPageTransformer PageTransformer { get; set; } = new OnboardingPageTransformer();
         public int ButtonNextLayout { get; set; } = Resource.Layout.onboarding_next_button;
         public int ButtonSkipLayout { get; set; } = Resource.Layout.onboarding_skip_button;
         public int ButtonFinishLayout { get; set; } = Resource.Layout.onboarding_finish_button;
+        public int HideOnboardingAnimation { get; set; } = -1;
 
         public void Show(FragmentManager fragmentManager) {
             _viewPagerAdapter = new OnboardingFragmentPagerAdapter(fragmentManager, Fragments);
@@ -95,22 +98,35 @@ namespace Lonelywood.Onboarding.Android
             };
 
             _skipButton.Click += (sender, args) => {
-                Visibility = ViewStates.Gone;
+                HideComponent();
                 ButtonSkipCommand?.Execute(null);
             };
 
             _finishButton.Click += (sender, args) => {
-                Visibility = ViewStates.Gone;
+                HideComponent();
                 ButtonFinishCommand?.Execute(null);
             };
 
             _viewPager.PageSelected += OnPageSelected;
         }
 
+        private void HideComponent() {
+            if (HideOnboardingAnimation == -1) {
+                Visibility = ViewStates.Gone;
+                return;
+            }
+
+            var animation = AnimationUtils.LoadAnimation(_context, HideOnboardingAnimation);
+            animation.AnimationEnd += (sender, args) => Visibility = ViewStates.Gone;
+            StartAnimation(animation);
+        }
+
         private void OnPageSelected(object sender, ViewPager.PageSelectedEventArgs e) {
             _nextButton.Visibility = e.Position == _viewPagerAdapter.Count -1 ? ViewStates.Gone : ViewStates.Visible;
             _skipButton.Visibility = e.Position == _viewPagerAdapter.Count - 1 ? ViewStates.Gone : ViewStates.Visible;
-            _finishButton.Visibility = e.Position == _viewPagerAdapter.Count - 1 ? ViewStates.Visible : ViewStates.Gone;
+
+            if (ShowFinishButton)
+                _finishButton.Visibility = e.Position == _viewPagerAdapter.Count - 1 ? ViewStates.Visible : ViewStates.Gone;
         }
 
         private void OnTranformPageEvent(object sender, TransformPageEventArgs e) {
